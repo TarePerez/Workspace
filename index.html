@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Young4Chicks - Login</title>
+    <link rel="stylesheet" href=".young-chick/bootstap-53.6/css/bootstrap-5.3.6/css/bootstrap.css" />
+    <link rel="stylesheet" href="/.young-chick/css/custom.css" />
+    <style>
+        /* Make the body take full height and center content */
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f9fa; /* Light background for contrast */
+        }
+        /* Optional: add a shadow and rounded corners to mimic a popup/modal */
+        .popup-container {
+            width: 100%;
+            max-width: calc(100% - 220px);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+   <div class="content"></div>
+    <div class="popup-container p-5 bg-primary text-white text-center">
+        <h3 class="text-center mb-4" id="welcomeText">Welcome to Young4Chicks</h3>
+        <div class="card border-primary">
+           <div w3-include-html="/young-chick/includes/sidebar.html"></div>
+            <div class="card-body">
+                <form action="">
+                    <div class="mb-4">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" />
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" />
+                    </div>
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember" />
+                        <label class="form-check-label" for="remember">Remember me</label>
+                    </div>
+                    <div class="d-grid">
+                        <a class="btn btn-primary" href="/young-for-chicks/dashboard.html">
+                            Login
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script src="css/bootstrap-5.3.6/js/bootstrap.bundle.js"></script>
+    <script src="/young-chick/js/include.js"></script>
+<script>
+  includeHTML();
+</script>
+
+</body>
+
+</html>
