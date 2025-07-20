@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Todo-List</title>
+    <script src="https://kit.fontawesome.com/97dffca0dc.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <style>
+
+        .container {
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+        }
+
+        .task-list {
+            margin-top: 20px;
+        }
+
+        .task-list th,
+        .task-list td {
+            padding: 13px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .task-actions {
+            text-align: center;
+        }
+
+
+        .form-control {
+            background-color: #4e545a;
+            border-color: #4e545a;
+            color: #fff;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0069d9;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #c82333;
+        }
+
+        .task-actions {
+            width: 150px;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1 class="text-center mt-4 p-3">My List <i class="fas fa-tasks"></i></h1>
+
+    <div class="task-list mt-4">
+        <table class="table table-dark table-hover " style="width: 100%; font-size: 16px;">
+            <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="task-actions">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for task in tasks %}
+
+                <tr{% if task.status == "Completed" %} class="completed-task" {% endif %}>
+
+                    <td>{{ task.title }}</td>
+                    <td>{{ task.description }}</td>
+                    <td class="{% if task.priority == "High" %} text-warning
+                     {% elif task.priority == "Medium" %} text-info {% endif %}">
+                        {{ task.priority }}
+                    </td>
+                    <td>
+                        {% if task.status == "Completed" %}
+                            <i class="fas fa-check-circle text-success"></i>
+                        {% else %}
+                            <i class="fas fa-times-circle text-danger"></i>
+                        {% endif %}
+                    </td>
+
+                    <td class="task-actions">
+
+                        <a href="{% url 'update_task' task.id %}"
+                           class="btn btn-sm btn-outline-secondary me-2 mb-2"
+                           data-toggle="modal" data-target="#editTaskModal{{ task.id }}">
+                            Edit
+                        </a>
+
+                        <a href="{% url 'delete_task' task.id %}" class="mb-2 btn btn-sm btn-outline-danger"
+                           onclick="return confirm('Are you sure you want to delete this task?')">
+                            Delete
+                        </a>
+
+                    </td>
+
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No tasks available.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if messages %}
+
+    <div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4 ms-3 ps-3">
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+{% endif %}
+
+
+<!-- Add Task & Reset Tasks Btn -->
+
+<div class="container text-center pt-2 mt-2">
+    <div class="d-flex justify-content-center align-items-center">
+
+
+        <button type="button" class="btn btn-primary mt-4" data-toggle="modal"
+                data-target="#addTaskModal">
+            Add New Task
+        </button>
+
+        <form action="{% url 'reset_tasks' %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger ms-3 mt-4"
+                    onclick="return confirm('Are you sure you want to delete tasks?')">
+                Reset All Tasks
+            </button>
+        </form>
+
+    </div>
+
+
+</div>
+
+
+<!-- Add Task Modal -->
+
+<div class="modal fade" id="addTaskModal" tabindex="-1" role="dialog" aria-labelledby="addTaskModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTaskModalLabel">Add a new Task</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-task-form" action="{% url 'create_task' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label" for="title">Title</label>
+                        <input type="text" name="title" id="title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="description">Description</label>
+                        <textarea name="description" id="description" class="form-control"></textarea>
+                    </div>
+
+
+                    <label class="form-label" for="priority">Priority</label>
+                    <select name="priority" id="priority" class="form-control">
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                    <label class="form-label" for="status">Status</label>
+                    <select name="status" id="status" class="form-control">
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary mt-3">Add Task</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Task Modals -->
+{% for task in tasks %}
+    <div class="modal fade" id="editTaskModal{{ task.id }}" tabindex="-1" role="dialog"
+         aria-labelledby="editTaskModalLabel{{ task.id }}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTaskModalLabel{{ task.id }}">Edit Task</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-task-form" action="{% url 'update_task' task.id %}" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label class="form-label" for="edit-title">Title</label>
+                            <input type="text" name="title" id="edit-title" class="form-control"
+                                   value="{{ task.title }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="edit-description">Description</label>
+                            <textarea name="description" id="edit-description"
+                                      class="form-control">{{ task.description }}</textarea>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="form-label" for="edit-priority">Priority</label>
+                            <select name="priority" id="edit-priority" class="form-control">
+                                <option value="High" {% if task.priority == 'High' %}selected{% endif %}>High</option>
+                                <option value="Medium" {% if task.priority == 'Medium' %}selected{% endif %}>Medium
+                                </option>
+                                <option value="Low" {% if task.priority == 'Low' %}selected{% endif %}>Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="edit-status">Status</label>
+                            <select name="status" id="edit-status" class="form-control">
+                                <option value="Pending" {% if task.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="Completed" {% if task.status == 'Completed' %}selected{% endif %}>
+                                    Completed
+                                </option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Update Task</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</div>
+
+</body>
+</html>
